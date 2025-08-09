@@ -1,400 +1,173 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>StarpiesAi — Modern Art</title>
+<meta charset="UTF-8">
+<title>🌟 StarpiesAi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  :root{
-    --bg:#071224; --panel:#0f1724; --muted: #9aa8bf;
-    --accent1:#ffd86b; --accent2:#ff6bb5; --glass: rgba(255,255,255,0.03);
-    --maxw:980px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:#eaf4ff;background:linear-gradient(180deg,var(--bg),#0b1220);-webkit-font-smoothing:antialiased}
-  /* header */
-  .header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:transparent;max-width:var(--maxw);margin:12px auto}
-  .left-controls{display:flex;align-items:center;gap:12px}
-  .menu-btn{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);cursor:pointer}
-  .brand{font-weight:700;font-size:18px}
-  .profile{width:40px;height:40px;border-radius:999px;background:conic-gradient(from 120deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#071426;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
-  /* layout */
-  .wrap{width:100%;max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns: 1fr; gap:12px}
-  .main-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);box-shadow:0 20px 60px rgba(2,6,23,0.6)}
-  .content{display:grid;grid-template-columns: 360px 1fr;}
-  @media (max-width:880px){ .content{grid-template-columns:1fr} .sidebar { display:none } }
-  /* sidebar (hidden in mobile) */
-  .sidebar{padding:18px;border-right:1px solid rgba(255,255,255,0.02);background:transparent}
-  .logo{width:56px;height:56px;border-radius:12px;background:conic-gradient(from 120deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#071426;font-weight:800;margin-bottom:12px}
-  .section{margin-top:10px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02)}
-  .label{font-size:13px;color:var(--muted);margin-bottom:6px}
-  .input, .select { width:100%; padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03); background:transparent;color:inherit; outline:none }
-  .row{display:flex;gap:8px}
-  .btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#071426;font-weight:700;cursor:pointer}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-  .small{font-size:13px;color:var(--muted);margin-top:8px}
-  /* chat area */
-  .chat-area{display:flex;flex-direction:column;min-height:520px}
-  .chat-header{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid rgba(255,255,255,0.02)}
-  .chat-header h2{margin:0}
-  .messages{padding:18px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;background:
-    radial-gradient(ellipse at top left, rgba(255,255,255,0.012), transparent 18%),
-    linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));scroll-behavior:smooth}
-  .bubble{max-width:76%;padding:12px 14px;border-radius:12px;line-height:1.4;box-shadow:0 10px 30px rgba(2,6,23,0.6);transform-origin:center;opacity:0;transform:translateY(8px) scale(.995);animation:pop .18s forwards}
-  @keyframes pop{to{opacity:1;transform:none}}
-  .bubble.user{margin-left:auto;background:linear-gradient(90deg,#8be9ff,#66d6ff);color:#071422;border-bottom-right-radius:4px}
-  .bubble.bot{margin-right:auto;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));color:#eaf4ff;border-bottom-left-radius:4px;border:1px solid rgba(255,255,255,0.03)}
-  .meta{font-size:11px;color:var(--muted);margin-top:6px;text-align:right}
-  /* composer */
-  .composer{display:flex;gap:10px;padding:12px;border-top:1px solid rgba(255,255,255,0.02);align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
-  .compose-input{flex:1;display:flex;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
-  .compose-input input{flex:1;border:none;background:transparent;color:inherit;outline:none;padding:6px}
-  .send{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#071426;font-weight:800;cursor:pointer}
-  /* floating menu small (mobile) */
-  .floating-menu{position:fixed;left:16px;bottom:20px;width:48px;height:48px;border-radius:12px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
-  /* profile quick */
-  .profile-quick{position:fixed;right:16px;top:16px;width:45px;height:45px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  .profile-quick .dot{width:45px;height:45px;border-radius:999px;background:conic-gradient(from 120deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#071426;font-weight:800;border:1px solid rgba(255,255,255,0.04)}
-  /* modal */
-  .overlay{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;padding:20px}
-  .modal{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;max-width:420px;width:100%;border:1px solid rgba(255,255,255,0.03)}
-  .nav-item{display:flex;gap:8px;align-items:center;padding:10px;border-radius:10px;cursor:pointer}
-  .muted{color:var(--muted)}
-  /* tiny helpers */
-  .hidden{display:none}
+    body { margin:0; font-family: Arial, sans-serif; background:#f5f5f5; }
+    header { background:#202123; color:white; padding:10px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-size:18px; }
+    .menu { cursor:pointer; font-size:20px; }
+    .profile { width:32px; height:32px; border-radius:50%; background:#4CAF50; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer; }
+
+    .chat-container { max-width:800px; margin:auto; padding:10px; }
+    .chat-box { background:white; padding:20px; border-radius:10px; min-height:400px; box-shadow:0 2px 6px rgba(0,0,0,0.1); overflow-y:auto; }
+    .message { padding:10px; border-radius:8px; margin-bottom:10px; max-width:80%; animation:fadeIn 0.3s ease-in-out; }
+    .user { background:#007bff; color:white; margin-left:auto; }
+    .bot { background:#e5e5ea; color:black; margin-right:auto; }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+    .input-box { display:flex; margin-top:10px; }
+    .input-box input { flex:1; padding:10px; border-radius:8px; border:1px solid #ccc; }
+    .input-box button { padding:10px 15px; margin-left:10px; border:none; border-radius:8px; background:#28a745; color:white; cursor:pointer; }
+
+    /* Sidebar menu */
+    .sidebar { position:fixed; top:0; left:-250px; width:250px; height:100%; background:#333; color:white; padding:20px; transition:0.3s; }
+    .sidebar.active { left:0; }
+    .sidebar a { display:block; padding:10px 0; color:white; text-decoration:none; border-bottom:1px solid #555; }
+    .sidebar a:hover { background:#444; }
+
+    /* Modal login/register */
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+    .modal-content { background:white; padding:20px; border-radius:10px; width:300px; }
+    .modal-content h2 { margin-top:0; }
+    .modal-content input { width:100%; padding:8px; margin:5px 0; }
+    .modal-content button { width:100%; padding:10px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<!-- header -->
-<div class="header">
-  <div class="left-controls">
-    <div class="menu-btn" id="menuBtn" title="Menu (dashboard)">⋮</div>
-    <div class="brand">StarpiesAi</div>
-  </div>
-  <div class="profile-quick" title="Profile (click)">
-    <div class="dot" id="profileBtn">SA</div>
-  </div>
+<header>
+    <div class="menu" onclick="toggleSidebar()">☰</div>
+    <h1>🌟 StarpiesAi</h1>
+    <div class="profile" onclick="openLogin()">👤</div>
+</header>
+
+<div class="sidebar" id="sidebar">
+    <a href="#" onclick="resetChat()">🔄 Reset Chat</a>
+    <a href="https://tiktok.com/hafizzxyc" target="_blank">🎵 TikTok Developer</a>
+    <a href="https://t.me/@syredstricks" target="_blank">💬 Telegram Developer</a>
+    <a href="#" onclick="logout()">🚪 Logout</a>
 </div>
 
-<!-- main container -->
-<div class="wrap">
-  <div class="main-card">
-    <div class="content">
-      <!-- Sidebar (desktop) -->
-      <aside class="sidebar">
-        <div class="logo">SA</div>
-
-        <div class="section">
-          <div class="label">Akun</div>
-          <div><small class="muted" id="whoLabel">Belum login</small></div>
-          <div style="margin-top:8px" id="authRow">
-            <input id="quickUser" class="input" placeholder="username" style="margin-bottom:8px">
-            <input id="quickPass" type="password" class="input" placeholder="password">
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button id="quickLogin" class="btn">Login</button>
-              <button id="quickReg" class="btn ghost">Register</button>
-            </div>
-          </div>
-          <div style="margin-top:8px">
-            <button id="quickLogout" class="btn ghost hidden">Logout</button>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="label">Quick actions</div>
-          <div style="display:flex;gap:8px">
-            <button id="resetChat" class="btn ghost">Hapus Riwayat</button>
-            <button id="exportChat" class="btn">Riset Chat</button>
-          </div>
-          <div class="small" style="margin-top:8px">Riwayat tersimpan per pengguna di browser.</div>
-        </div>
-
-        <div class="section">
-          <div class="label">Developer</div>
-          <div class="small">TikTok: <a href="https://tiktok.com/hafizzxyc" target="_blank" class="muted">@hafizzxyc</a></div>
-          <div class="small">Telegram: <a href="https://t.me/@syredstricks" target="_blank" class="muted">@syredstricks</a></div>
-        </div>
-      </aside>
-
-      <!-- Chat area -->
-      <section class="chat-area">
-        <div class="chat-header">
-          <h2>Chat</h2>
-          <div class="muted" id="status">Ready</div>
-        </div>
-
-        <div id="messages" class="messages" role="log" aria-live="polite"></div>
-
-        <form id="composer" class="composer" onsubmit="return false;">
-          <div class="compose-input">
-            <input id="inputText" placeholder="Ketik pesan... (Enter untuk kirim)" autocomplete="off" />
-          </div>
-          <button id="sendBtn" class="send">Kirim</button>
-        </form>
-      </section>
+<div class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-box">
+        <input type="text" id="userInput" placeholder="Ketik pesan..." />
+        <button onclick="sendMessage()">Kirim</button>
     </div>
-  </div>
 </div>
 
-<!-- floating for mobile -->
-<div class="floating-menu" id="floatingMenu" title="Menu">⋮</div>
+<!-- Modal Login -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Username">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p>Belum punya akun? <a href="#" onclick="openRegister()">Register</a></p>
+    </div>
+</div>
 
-<!-- overlay modal (used for menu on mobile + profile) -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong>Dashboard</strong>
-      <button id="closeModal" class="btn ghost">Tutup</button>
+<!-- Modal Register -->
+<div class="modal" id="registerModal">
+    <div class="modal-content">
+        <h2>Register</h2>
+        <input type="text" id="regUser" placeholder="Username">
+        <input type="password" id="regPass" placeholder="Password">
+        <button onclick="register()">Register</button>
+        <p>Sudah punya akun? <a href="#" onclick="openLogin()">Login</a></p>
     </div>
-    <div style="margin-top:12px">
-      <div class="nav-item" id="navLogin"><strong>🔐 Login</strong></div>
-      <div class="nav-item" id="navRegister">🆕 Register</div>
-      <div class="nav-item" id="navExport">📤 Riset Chat (Export)</div>
-      <div class="nav-item" id="navReset">♻️ Hapus Riwayat</div>
-      <div class="nav-item" id="navContact">📞 Hubungi Developer</div>
-    </div>
-    <div id="modalBody" style="margin-top:12px"></div>
-  </div>
 </div>
 
 <script>
-/* ---------- Utilities ---------- */
-const $ = id => document.getElementById(id);
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-async function sha256hex(str){
-  const enc = new TextEncoder();
-  const buf = await crypto.subtle.digest('SHA-256', enc.encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+let currentUser = localStorage.getItem("currentUser") || null;
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* ---------- Storage Keys ---------- */
-const USERS = 'starpies_users'; // object {username:{passHash}}
-const SESSION = 'starpies_session';
-const CHAT_PREFIX = 'starpies_chat_';
-
-/* ---------- Elements ---------- */
-const menuBtn = $('menuBtn'), floatingMenu = $('floatingMenu'), overlay = $('overlay'), modal = $('modal'), closeModal = $('closeModal');
-const navLogin = $('navLogin'), navRegister = $('navRegister'), navExport = $('navExport'), navReset = $('navReset'), navContact = $('navContact');
-const whoLabel = $('whoLabel'), quickUser = $('quickUser'), quickPass = $('quickPass'), quickLogin = $('quickLogin'), quickReg = $('quickReg'), quickLogout = $('quickLogout');
-const resetChat = $('resetChat'), exportChat = $('exportChat');
-const messagesEl = $('messages'), inputText = $('inputText'), sendBtn = $('sendBtn'), statusEl = $('status');
-const profileBtn = $('profileBtn'), floatingMenuBtn = $('floatingMenu');
-
-/* ---------- State ---------- */
-let currentUser = localStorage.getItem(SESSION) || null;
-updateAuthUI();
-loadChatOnStart();
-
-/* ---------- Helpers: users & chats ---------- */
-function getUsers(){ return JSON.parse(localStorage.getItem(USERS) || '{}'); }
-function setUsers(u){ localStorage.setItem(USERS, JSON.stringify(u)); }
-function getChatKey(user){ return CHAT_PREFIX + user; }
-function saveChat(user){
-  if(!user) return;
-  const msgs = [];
-  messagesEl.querySelectorAll('.bubble').forEach(b => msgs.push({ sender: b.classList.contains('user') ? 'user' : 'bot', text: b.querySelector('.content').textContent || '' }));
-  localStorage.setItem(getChatKey(user), JSON.stringify(msgs));
-}
-function loadChat(user){
-  messagesEl.innerHTML='';
-  if(!user) return;
-  const raw = localStorage.getItem(getChatKey(user));
-  if(!raw) return;
-  try{
-    const arr = JSON.parse(raw);
-    arr.forEach(m => addBubble(m.text, m.sender, false));
-  }catch(e){ console.error(e); }
-}
-
-/* ---------- Auth: quick register/login/logout ---------- */
-quickReg.addEventListener('click', async () => {
-  const u = quickUser.value.trim(); const p = quickPass.value;
-  if(!u || !p){ alert('Isi username & password'); return; }
-  const users = getUsers();
-  if(users[u]){ alert('Username sudah ada'); return; }
-  users[u] = { passHash: await sha256hex(p) };
-  setUsers(users);
-  quickUser.value=''; quickPass.value='';
-  alert('Akun dibuat. Silakan login.');
-});
-quickLogin.addEventListener('click', async () => {
-  const u = quickUser.value.trim(); const p = quickPass.value;
-  if(!u || !p){ alert('Isi username & password'); return; }
-  const users = getUsers();
-  if(!users[u]){ alert('User tidak ditemukan'); return; }
-  const h = await sha256hex(p);
-  if(h !== users[u].passHash){ alert('Password salah'); return; }
-  currentUser = u; localStorage.setItem(SESSION, u);
-  quickUser.value=''; quickPass.value='';
-  updateAuthUI(); loadChat(u); statusEl.textContent = `Logged in as ${u}`;
-});
-quickLogout.addEventListener('click', ()=>{ localStorage.removeItem(SESSION); currentUser=null; updateAuthUI(); messagesEl.innerHTML=''; statusEl.textContent='Ready'; });
-
-function updateAuthUI(){
-  if(currentUser){
-    whoLabel.textContent = `Logged in: ${currentUser}`;
-    quickLogout.classList.remove('hidden');
-    document.querySelector('#authRow').classList.add('hidden');
-  } else {
-    whoLabel.textContent = 'Belum login';
-    quickLogout.classList.add('hidden');
-    document.querySelector('#authRow').classList.remove('hidden');
-  }
-}
-
-/* ---------- Chat UI ---------- */
-function addBubble(text, who='bot', save=true){
-  const el = document.createElement('div'); el.className = 'bubble ' + (who==='user' ? 'user' : 'bot');
-  el.innerHTML = `<div class="content">${escapeHtml(text)}</div><div class="meta">${new Date().toLocaleTimeString()}</div>`;
-  messagesEl.appendChild(el); messagesEl.scrollTop = messagesEl.scrollHeight;
-  if(save && currentUser) saveChat(currentUser);
-  return el;
-}
-function setBubbleText(b, txt){ b.querySelector('.content').textContent = txt; messagesEl.scrollTop = messagesEl.scrollHeight; }
-async function typeBubble(b, txt, speed=14){
-  setBubbleText(b,'');
-  for(let i=0;i<txt.length;i++){ b.querySelector('.content').textContent += txt.charAt(i); messagesEl.scrollTop = messagesEl.scrollHeight; await new Promise(r=>setTimeout(r,speed)); }
-  if(currentUser) saveChat(currentUser);
-}
-
-/* ---------- Send message & API ---------- */
-sendBtn.addEventListener('click', sendMessage);
-inputText.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
-
-async function sendMessage(){
-  const prompt = inputText.value.trim(); if(!prompt) return;
-  if(!currentUser){ if(!confirm('Kamu belum login — chat tidak akan tersimpan. Lanjutkan?')) return; }
-  addBubble(prompt,'user');
-  inputText.value='';
-  const typingEl = addBubble('...', 'bot', false);
-  statusEl.textContent = 'Menghubungi API...';
-
-  try{
-    const url = `https://api.sxtream.xyz/ai/megpt?query=${encodeURIComponent(prompt)}`;
-    const resp = await fetch(url, { method:'GET', headers:{ 'Accept':'application/json' } });
-    if(!resp.ok){
-      const t = await resp.text().catch(()=>String(resp.status));
-      setBubbleText(typingEl, `❌ Server: ${resp.status} ${t}`);
-      statusEl.textContent = 'Error';
-      if(currentUser) saveChat(currentUser);
-      return;
+function openLogin() {
+    if (currentUser) {
+        alert("Sudah login sebagai " + currentUser);
+    } else {
+        document.getElementById("loginModal").style.display = "flex";
     }
-    const json = await resp.json().catch(()=>({}));
-    const reply = json?.data ?? json?.message ?? JSON.stringify(json);
-    await typeBubble(typingEl, String(reply), 14);
-    statusEl.textContent = 'Ready';
-    if(currentUser) saveChat(currentUser);
-  }catch(err){
-    setBubbleText(typingEl, `❌ Network error: ${err.message}. Jika CORS, gunakan proxy.`); console.error(err);
-    statusEl.textContent = 'Network error';
-    if(currentUser) saveChat(currentUser);
-  }
 }
 
-/* ---------- Export & Reset ---------- */
-exportChat.addEventListener('click', ()=> exportCurrentChat());
-$('exportChat')?.addEventListener && $('exportChat').addEventListener('click', ()=>{}); // safe
-
-function exportCurrentChat(){
-  if(!currentUser){ alert('Login dulu untuk export chat per-user.'); return; }
-  const raw = localStorage.getItem(getChatKey(currentUser));
-  if(!raw){ alert('Tidak ada riwayat.'); return; }
-  const msgs = JSON.parse(raw);
-  let txt = `StarpiesAi Chat Export — user: ${currentUser}\n\n`;
-  msgs.forEach(m => txt += `[${m.sender.toUpperCase()}] ${m.text}\n\n`);
-  const blob = new Blob([txt], { type:'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`starpiesai_${currentUser}_chat.txt`; document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+function openRegister() {
+    document.getElementById("loginModal").style.display = "none";
+    document.getElementById("registerModal").style.display = "flex";
 }
 
-resetChat.addEventListener('click', ()=>{
-  if(!currentUser){ if(confirm('Hapus semua riwayat lokal untuk semua user?')){ for(const k of Object.keys(localStorage)){ if(k.startsWith(CHAT_PREFIX)) localStorage.removeItem(k); } messagesEl.innerHTML=''; alert('Semua riwayat dihapus.'); } return; }
-  if(confirm(`Hapus riwayat chat untuk ${currentUser}?`)){ localStorage.removeItem(getChatKey(currentUser)); messagesEl.innerHTML=''; alert('Riwayat dihapus.'); }
-});
-
-/* ---------- Menu (overlay) ---------- */
-function openModal(){
-  overlay.style.display='flex';
-}
-function closeModalFn(){ overlay.style.display='none'; $('modalBody').innerHTML=''; }
-menuBtn.addEventListener('click', openModal);
-floatingMenu.addEventListener('click', openModal);
-closeModal.addEventListener('click', closeModalFn);
-overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModalFn(); });
-
-navLogin.addEventListener('click', ()=>{ showModalLogin(); });
-navRegister.addEventListener('click', ()=>{ showModalRegister(); });
-navExport.addEventListener('click', ()=>{ exportCurrentChat(); });
-navReset.addEventListener('click', ()=>{ resetChat.click(); });
-navContact.addEventListener('click', ()=>{ showContact(); });
-
-function showModalLogin(){
-  $('modalBody').innerHTML = `
-    <div style="margin-top:10px">
-      <div class="label">Login</div>
-      <input id="mUser" class="input" placeholder="username" />
-      <input id="mPass" class="input" placeholder="password" type="password" />
-      <div style="display:flex;gap:8px;margin-top:8px"><button id="mLoginBtn" class="btn">Login</button><button id="mCancel" class="btn ghost">Batal</button></div>
-    </div>
-  `;
-  $('#mCancel').addEventListener('click', closeModalFn);
-  $('#mLoginBtn').addEventListener('click', async ()=>{
-    const u = $('#mUser').value.trim(), p = $('#mPass').value;
-    if(!u||!p){ alert('Isi username & password'); return; }
-    const users = getUsers();
-    if(!users[u]){ alert('User tidak ditemukan'); return; }
-    const h = await sha256hex(p);
-    if(h !== users[u].passHash){ alert('Password salah'); return; }
-    currentUser = u; localStorage.setItem(SESSION, u); updateAuthUI(); loadChat(u); statusEl.textContent = `Logged in as ${u}`; closeModalFn();
-  });
+function closeModals() {
+    document.getElementById("loginModal").style.display = "none";
+    document.getElementById("registerModal").style.display = "none";
 }
 
-function showModalRegister(){
-  $('modalBody').innerHTML = `
-    <div style="margin-top:10px">
-      <div class="label">Register</div>
-      <input id="rUser" class="input" placeholder="username" />
-      <input id="rPass" class="input" placeholder="password" type="password" />
-      <div style="display:flex;gap:8px;margin-top:8px"><button id="rBtn" class="btn">Buat Akun</button><button id="rCancel" class="btn ghost">Batal</button></div>
-    </div>
-  `;
-  $('#rCancel').addEventListener('click', closeModalFn);
-  $('#rBtn').addEventListener('click', async ()=>{
-    const u = $('#rUser').value.trim(), p = $('#rPass').value;
-    if(!u||!p){ alert('Isi username & password'); return; }
-    const users = getUsers();
-    if(users[u]){ alert('Username sudah ada'); return; }
-    users[u] = { passHash: await sha256hex(p) };
-    setUsers(users); alert('Akun dibuat. Silakan login.'); closeModalFn();
-  });
+function register() {
+    let user = document.getElementById("regUser").value.trim();
+    let pass = document.getElementById("regPass").value.trim();
+    if (!user || !pass) return alert("Isi semua data!");
+    if (localStorage.getItem("user_"+user)) return alert("Username sudah terdaftar!");
+    localStorage.setItem("user_"+user, pass);
+    alert("Registrasi berhasil! Silakan login.");
+    closeModals();
 }
 
-function showContact(){
-  $('modalBody').innerHTML = `
-    <div style="margin-top:10px">
-      <h3>Hubungi Developer</h3>
-      <div class="small" style="margin-top:8px">TikTok: <a href="https://tiktok.com/hafizzxyc" target="_blank" class="muted">@hafizzxyc</a></div>
-      <div class="small">Telegram: <a href="https://t.me/@syredstricks" target="_blank" class="muted">@syredstricks</a></div>
-      <div style="margin-top:12px"><button class="btn ghost" onclick="closeModalFn()">Tutup</button></div>
-    </div>
-  `;
+function login() {
+    let user = document.getElementById("loginUser").value.trim();
+    let pass = document.getElementById("loginPass").value.trim();
+    let storedPass = localStorage.getItem("user_"+user);
+    if (!storedPass) return alert("User tidak ditemukan!");
+    if (storedPass !== pass) return alert("Password salah!");
+    currentUser = user;
+    localStorage.setItem("currentUser", user);
+    alert("Login berhasil!");
+    closeModals();
 }
 
-/* ---------- Profile quick actions ---------- */
-profileBtn.addEventListener('click', ()=>{
-  if(currentUser){
-    if(confirm('Logout sekarang?')){ localStorage.removeItem(SESSION); currentUser=null; updateAuthUI(); messagesEl.innerHTML=''; statusEl.textContent='Ready'; }
-  } else {
-    openModal(); showModalLogin();
-  }
-});
+function logout() {
+    localStorage.removeItem("currentUser");
+    currentUser = null;
+    alert("Logout berhasil!");
+}
 
-/* ---------- On start ---------- */
-function loadChatOnStart(){
-  if(currentUser){ updateAuthUI(); loadChat(currentUser); statusEl.textContent = `Logged in as ${currentUser}`; }
-  else { addBubble('Halo! Silakan register atau login via menu (⋮). Jika tidak login, chat tetap bisa tapi tidak tersimpan.', 'bot', false); statusEl.textContent='Ready'; }
+async function sendMessage() {
+    if (!currentUser) return alert("Login dulu untuk chat!");
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+
+    try {
+        const url = `https://api.sxtream.xyz/ai/megpt?query=${encodeURIComponent(text)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data?.data) {
+            addMessage(data.data, 'bot');
+        } else {
+            addMessage('❌ Tidak ada respon dari AI', 'bot');
+        }
+    } catch (err) {
+        addMessage('⚠️ Gagal fetch API', 'bot');
+    }
+}
+
+function addMessage(text, sender) {
+    const chatBox = document.getElementById('chatBox');
+    const msg = document.createElement('div');
+    msg.className = `message ${sender}`;
+    msg.innerText = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function resetChat() {
+    document.getElementById('chatBox').innerHTML = '';
 }
 </script>
 </body>
